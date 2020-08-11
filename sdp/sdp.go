@@ -93,6 +93,7 @@ type SDP struct {
 	Ptime    int         // Transmit frame every N milliseconds (default 20)
 	SendOnly bool        // True if 'a=sendonly' was specified in SDP
 	RecvOnly bool        // True if 'a=recvonly' was specified in SDP
+	Fprint  *Fingerprint // Fingerprint
 	Attrs    [][2]string // a= lines we don't recognize
 	Other    [][2]string // Other description
 }
@@ -196,6 +197,16 @@ func Parse(s string) (sdp *SDP, err error) {
 				} else {
 					log.Println("Invalid SDP Ptime value", ptimeS)
 				}
+			case strings.HasPrefix(line, "fingerprint:"):
+				toks := strings.Split(line[12:], " ")
+				if toks == nil || len(toks) != 2 {
+					log.Println("Invalid SDP Fingerprint value")
+				} else {
+					sdp.Fprint = new(Fingerprint)
+					sdp.Fprint.HashFunc = toks[0]
+					sdp.Fprint.Fingerprint = toks[1]					
+				}
+
 			case line == "sendrecv":
 			case line == "sendonly":
 				sdp.SendOnly = true
@@ -357,6 +368,9 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 		b.WriteString("a=recvonly\r\n")
 	} else {
 		b.WriteString("a=sendrecv\r\n")
+	}
+	if sdp.Fprint != nil {
+		sdp.Fprint.Append(b)
 	}
 
 	// save unknown field
