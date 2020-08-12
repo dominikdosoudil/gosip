@@ -96,6 +96,7 @@ type SDP struct {
 	Fprint  *Fingerprint // Fingerprint
 	IceUfrag string 	 // ICE Ufag
 	IcePwd 	 string 	 // ICE password
+	RtcpMux bool         // RTCP MUX attribute
 	Attrs    [][2]string // a= lines we don't recognize
 	Other    [][2]string // Other description
 }
@@ -212,7 +213,8 @@ func Parse(s string) (sdp *SDP, err error) {
 				sdp.IcePwd = line[8:]
 			case strings.HasPrefix(line, "ice-ufrag:"):
 				sdp.IceUfrag = line[10:]
-
+			case line == "rtcp-mux":
+				sdp.RtcpMux = true
 			case line == "sendrecv":
 			case line == "sendonly":
 				sdp.SendOnly = true
@@ -390,7 +392,9 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 	} else {
 		b.WriteString("a=sendrecv\r\n")
 	}
-
+	if sdp.RtcpMux {
+		b.WriteString("a=rtcp-mux\r\n")
+	}
 	// save unknown field
 	if sdp.Other != nil {
 		for _, v := range sdp.Other {
