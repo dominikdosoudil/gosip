@@ -94,6 +94,8 @@ type SDP struct {
 	SendOnly bool        // True if 'a=sendonly' was specified in SDP
 	RecvOnly bool        // True if 'a=recvonly' was specified in SDP
 	Fprint  *Fingerprint // Fingerprint
+	IceUfrag string 	 // ICE Ufag
+	IcePwd 	 string 	 // ICE password
 	Attrs    [][2]string // a= lines we don't recognize
 	Other    [][2]string // Other description
 }
@@ -206,6 +208,10 @@ func Parse(s string) (sdp *SDP, err error) {
 					sdp.Fprint.HashFunc = toks[0]
 					sdp.Fprint.Fingerprint = toks[1]					
 				}
+			case strings.HasPrefix(line, "ice-pwd:"):
+				sdp.IcePwd = line[8:]
+			case strings.HasPrefix(line, "ice-ufrag:"):
+				sdp.IceUfrag = line[10:]
 
 			case line == "sendrecv":
 			case line == "sendonly":
@@ -362,15 +368,27 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 		b.WriteString(strconv.Itoa(sdp.Ptime))
 		b.WriteString("\r\n")
 	}
+	if sdp.Fprint != nil {
+		sdp.Fprint.Append(b)
+	}
+	if sdp.IcePwd == "" {
+	} else {
+		b.WriteString("a=ice-pwd:")
+		b.WriteString(sdp.IcePwd)
+		b.WriteString("\r\n")		
+	}
+	if sdp.IceUfrag == "" {
+	} else {
+		b.WriteString("a=ice-ufrag:")
+		b.WriteString(sdp.IceUfrag)
+		b.WriteString("\r\n")		
+	}
 	if sdp.SendOnly {
 		b.WriteString("a=sendonly\r\n")
 	} else if sdp.RecvOnly {
 		b.WriteString("a=recvonly\r\n")
 	} else {
 		b.WriteString("a=sendrecv\r\n")
-	}
-	if sdp.Fprint != nil {
-		sdp.Fprint.Append(b)
 	}
 
 	// save unknown field
