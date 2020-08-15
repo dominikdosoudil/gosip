@@ -98,6 +98,7 @@ type SDP struct {
 	IcePwd 	 string 	 // ICE password
 	Rtcp     *Rtcp       // RTCP
 	RtcpMux bool         // RTCP MUX attribute
+	Group    *Group      // Group bundle
 	Candidates []Candidate // ICE candidates
 	Attrs    [][2]string // a= lines we don't recognize
 	Other    [][2]string // Other description
@@ -264,6 +265,17 @@ func Parse(s string) (sdp *SDP, err error) {
 							ConnectionAddress: toks[3],
 						}
 					}		
+				}
+			case strings.HasPrefix(line, "group:"):
+				toks := strings.Split(line[6:], " ")
+				if toks == nil || len(toks) < 2 {
+					log.Println("Invalid SDP Group value")
+				} else {
+					sdp.Group = new(Group)
+					sdp.Group.Semantics = toks[0]
+					for i := 1; i < len(toks); i++ {
+						sdp.Group.IdentificationTag = append(sdp.Group.IdentificationTag, toks[i])
+					}
 				}						
 			case line == "rtcp-mux":
 				sdp.RtcpMux = true
@@ -438,6 +450,9 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 	}
 	for i, _ := range sdp.Candidates {
 		sdp.Candidates[i].Append(b)
+	}
+	if sdp.Group != nil {
+		sdp.Group.Append(b)
 	}
 	if sdp.SendOnly {
 		b.WriteString("a=sendonly\r\n")
