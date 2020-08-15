@@ -96,6 +96,7 @@ type SDP struct {
 	Fprint  *Fingerprint // Fingerprint
 	IceUfrag string 	 // ICE Ufag
 	IcePwd 	 string 	 // ICE password
+	Rtcp     *Rtcp       // RTCP
 	RtcpMux bool         // RTCP MUX attribute
 	Candidates []Candidate // ICE candidates
 	Attrs    [][2]string // a= lines we don't recognize
@@ -241,14 +242,29 @@ func Parse(s string) (sdp *SDP, err error) {
  						candidate.RelAddr = toks[9]
  					}
   					if len(toks) >= 12 && toks[10] == "rport" {
-						if relPort, err := strconv.Atoi(toks[11]); err!= nil {
+						if relPort, err := strconv.Atoi(toks[11]); err != nil {
 							log.Println("Invalid SDP Candidate relport value")
 						} else {
 							candidate.RelPort = relPort
 						}
  					}
  					sdp.Candidates = append(sdp.Candidates, candidate)
-				}				
+				}
+			case strings.HasPrefix(line, "rtcp:"):
+				toks := strings.Split(line[5:], " ")
+				if toks == nil || len(toks) != 4 {
+					log.Println("Invalid SDP RTCP value")
+				} else {
+					if port, err := strconv.Atoi(toks[0]); err != nil {
+						log.Println("Invalid SDP RTCP port value")
+					} else {
+						sdp.Rtcp = &Rtcp{Port: uint16(port), 
+							Nettype: toks[1], 
+							Addrtype: toks[2], 
+							ConnectionAddress: toks[3],
+						}
+					}		
+				}						
 			case line == "rtcp-mux":
 				sdp.RtcpMux = true
 			case line == "sendrecv":
