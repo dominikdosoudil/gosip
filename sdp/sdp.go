@@ -100,6 +100,7 @@ type SDP struct {
 	RtcpMux bool         // RTCP MUX attribute
 	Group    *Group      // Group bundle
 	Candidates []Candidate // ICE candidates
+	Ssrcs []Ssrc 		 // SSRC
 	Attrs    [][2]string // a= lines we don't recognize
 	Other    [][2]string // Other description
 }
@@ -250,6 +251,22 @@ func Parse(s string) (sdp *SDP, err error) {
 						}
  					}
  					sdp.Candidates = append(sdp.Candidates, candidate)
+				}
+			case strings.HasPrefix(line, "ssrc:"):
+				toks := strings.Split(line[5:], " ")
+				if toks == nil {
+					log.Println("Invalid SDP SSRC value")
+				} else {
+					var ssrc Ssrc
+					ssrc.Id = toks[0]
+					if len(toks) >= 1 {
+						toks1 := strings.Split(toks[1], ":")
+						ssrc.Attribute = toks1[0]
+					}
+					if len(toks) >= 2 {
+						ssrc.Value = toks[2]
+					}				 
+					sdp.Ssrcs = append(sdp.Ssrcs, ssrc)
 				}
 			case strings.HasPrefix(line, "rtcp:"):
 				toks := strings.Split(line[5:], " ")
@@ -450,6 +467,9 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 	}
 	for i, _ := range sdp.Candidates {
 		sdp.Candidates[i].Append(b)
+	}
+	for i, _ := range sdp.Ssrcs {
+		sdp.Ssrcs[i].Append(b)
 	}
 	if sdp.Group != nil {
 		sdp.Group.Append(b)
