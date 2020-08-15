@@ -97,6 +97,7 @@ type SDP struct {
 	IceUfrag string 	 // ICE Ufag
 	IcePwd 	 string 	 // ICE password
 	RtcpMux bool         // RTCP MUX attribute
+	Candidates []Candidate // ICE candidates
 	Attrs    [][2]string // a= lines we don't recognize
 	Other    [][2]string // Other description
 }
@@ -213,6 +214,41 @@ func Parse(s string) (sdp *SDP, err error) {
 				sdp.IcePwd = line[8:]
 			case strings.HasPrefix(line, "ice-ufrag:"):
 				sdp.IceUfrag = line[10:]
+			case strings.HasPrefix(line, "candidate:"):
+				toks := strings.Split(line[10:], " ")
+				if toks == nil {
+					log.Println("Invalid SDP Candidate value")
+				} else {
+					var candidate Candidate
+					candidate.Foundation = toks[0]
+					candidate.ComponentId = toks[1]
+					candidate.Transport = toks[2]
+					if priority, err := strconv.Atoi(toks[3]); err!= nil {
+						log.Println("Invalid SDP Candidate priority value")
+					} else {
+						candidate.Priority = priority
+					}
+ 					candidate.ConnectionAddress = toks[4]
+					if port, err := strconv.Atoi(toks[5]); err!= nil {
+						log.Println("Invalid SDP Candidate port value")
+					} else {
+						candidate.Port = port
+					}
+ 					if len(toks) >= 8 && toks[6] == "typ" {
+ 						candidate.CandType = toks[7]
+ 					}
+ 					if len(toks) >= 10 && toks[8] == "raddr" {
+ 						candidate.RelAddr = toks[9]
+ 					}
+  					if len(toks) >= 12 && toks[10] == "rport" {
+						if relPort, err := strconv.Atoi(toks[11]); err!= nil {
+							log.Println("Invalid SDP Candidate relport value")
+						} else {
+							candidate.RelPort = relPort
+						}
+ 					}
+ 					sdp.Candidates = append(sdp.Candidates, candidate)
+				}				
 			case line == "rtcp-mux":
 				sdp.RtcpMux = true
 			case line == "sendrecv":
@@ -322,7 +358,7 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 	sdp.Origin.Append(b)
 	b.WriteString("s=")
 	if sdp.Session == "" {
-		b.WriteString("my people call themselves dark angels")
+		b.WriteString("-")
 	} else {
 		b.WriteString(sdp.Session)
 	}
@@ -333,8 +369,7 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 		b.WriteString("c=IN IP4 ")
 	}
 	if sdp.Addr == "" {
-		// In case of bugs, keep calm and DDOS NASA.
-		b.WriteString("69.28.157.198")
+		b.WriteString("0.0.0.0")
 	} else {
 		b.WriteString(sdp.Addr)
 	}
@@ -384,6 +419,9 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 		b.WriteString("a=ice-ufrag:")
 		b.WriteString(sdp.IceUfrag)
 		b.WriteString("\r\n")		
+	}
+	for i, _ := range sdp.Candidates {
+		sdp.Candidates[i].Append(b)
 	}
 	if sdp.SendOnly {
 		b.WriteString("a=sendonly\r\n")
