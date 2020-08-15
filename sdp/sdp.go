@@ -449,6 +449,9 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 	if sdp.RtcpMux {
 		b.WriteString("a=rtcp-mux\r\n")
 	}
+	if sdp.Rtcp != nil {
+		sdp.Rtcp.Append(b)
+	}
 	// save unknown field
 	if sdp.Other != nil {
 		for _, v := range sdp.Other {
