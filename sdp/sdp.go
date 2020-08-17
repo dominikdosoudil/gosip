@@ -258,29 +258,40 @@ func Parse(s string) (sdp *SDP, err error) {
 					log.Println("Invalid SDP SSRC value")
 				} else {
 					var ssrc Ssrc
-					ssrc.Id = toks[0]
 					if len(toks) >= 1 {
+						ssrc.Id = toks[0]
+					}
+					if len(toks) >= 2 {
 						toks1 := strings.Split(toks[1], ":")
 						ssrc.Attribute = toks1[0]
 					}
-					if len(toks) >= 2 {
+					if len(toks) >= 3 {
 						ssrc.Value = toks[2]
 					}				 
 					sdp.Ssrcs = append(sdp.Ssrcs, ssrc)
 				}
 			case strings.HasPrefix(line, "rtcp:"):
 				toks := strings.Split(line[5:], " ")
-				if toks == nil || len(toks) != 4 {
+				if toks == nil {
 					log.Println("Invalid SDP RTCP value")
 				} else {
-					if port, err := strconv.Atoi(toks[0]); err != nil {
-						log.Println("Invalid SDP RTCP port value")
-					} else {
-						sdp.Rtcp = &Rtcp{Port: uint16(port), 
-							Nettype: toks[1], 
-							Addrtype: toks[2], 
-							ConnectionAddress: toks[3],
-						}
+					var rtcp Rtcp
+					if len(toks) >= 2 {
+						rtcp.Nettype = toks[1]
+					}
+					if len(toks) >= 3 {
+						rtcp.Addrtype = toks[2]
+					}
+					if len(toks) >= 4 {
+						rtcp.ConnectionAddress = toks[3]
+					}
+					if len(toks) >= 1 {
+						if port, err := strconv.Atoi(toks[0]); err != nil {
+							log.Println("Invalid SDP RTCP port value")
+						} else {
+							rtcp.Port = uint16(port)
+							sdp.Rtcp = &rtcp
+						}		
 					}		
 				}
 			case strings.HasPrefix(line, "group:"):
