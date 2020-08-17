@@ -54,8 +54,7 @@ func (origin *Origin) Append(b *bytes.Buffer) {
 		b.WriteString(" IN IP4 ")
 	}
 	if origin.Addr == "" {
-		// In case of bugs, keep calm and DDOS NASA.
-		b.WriteString("69.28.157.198")
+		b.WriteString("0.0.0.0")
 	} else {
 		b.WriteString(origin.Addr)
 	}
