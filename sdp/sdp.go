@@ -96,6 +96,7 @@ type SDP struct {
 	Fprint  *Fingerprint // Fingerprint
 	IceUfrag string 	 // ICE Ufag
 	IcePwd 	 string 	 // ICE password
+	IceOnly  bool        // ICE trickle sdpfrag
 	Rtcp     *Rtcp       // RTCP
 	RtcpMux bool         // RTCP MUX attribute
 	Group    *Group      // Group bundle
@@ -410,33 +411,35 @@ func (sdp *SDP) String() string {
 }
 
 func (sdp *SDP) Append(b *bytes.Buffer) {
-	b.WriteString("v=0\r\n")
-	sdp.Origin.Append(b)
-	b.WriteString("s=")
-	if sdp.Session == "" {
-		b.WriteString("-")
-	} else {
-		b.WriteString(sdp.Session)
+	if !sdp.IceOnly {
+		b.WriteString("v=0\r\n")
+		sdp.Origin.Append(b)
+		b.WriteString("s=")
+		if sdp.Session == "" {
+			b.WriteString("-")
+		} else {
+			b.WriteString(sdp.Session)
+		}
+		b.WriteString("\r\n")
+		if util.IsIPv6(sdp.Addr) {
+			b.WriteString("c=IN IP6 ")
+		} else {
+			b.WriteString("c=IN IP4 ")
+		}
+		if sdp.Addr == "" {
+			b.WriteString("0.0.0.0")
+		} else {
+			b.WriteString(sdp.Addr)
+		}
+		b.WriteString("\r\n")
+		b.WriteString("t=")
+		if sdp.Time == "" {
+			b.WriteString("0 0")
+		} else {
+			b.WriteString(sdp.Time)
+		}
+		b.WriteString("\r\n")
 	}
-	b.WriteString("\r\n")
-	if util.IsIPv6(sdp.Addr) {
-		b.WriteString("c=IN IP6 ")
-	} else {
-		b.WriteString("c=IN IP4 ")
-	}
-	if sdp.Addr == "" {
-		b.WriteString("0.0.0.0")
-	} else {
-		b.WriteString(sdp.Addr)
-	}
-	b.WriteString("\r\n")
-	b.WriteString("t=")
-	if sdp.Time == "" {
-		b.WriteString("0 0")
-	} else {
-		b.WriteString(sdp.Time)
-	}
-	b.WriteString("\r\n")
 	if sdp.Audio != nil {
 		sdp.Audio.Append("audio", b)
 	}
@@ -485,12 +488,14 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 	if sdp.Group != nil {
 		sdp.Group.Append(b)
 	}
-	if sdp.SendOnly {
-		b.WriteString("a=sendonly\r\n")
-	} else if sdp.RecvOnly {
-		b.WriteString("a=recvonly\r\n")
-	} else {
-		b.WriteString("a=sendrecv\r\n")
+	if !sdp.IceOnly {
+		if sdp.SendOnly {
+			b.WriteString("a=sendonly\r\n")
+		} else if sdp.RecvOnly {
+			b.WriteString("a=recvonly\r\n")
+		} else {
+			b.WriteString("a=sendrecv\r\n")
+		}
 	}
 	if sdp.RtcpMux {
 		b.WriteString("a=rtcp-mux\r\n")
