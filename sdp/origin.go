@@ -17,7 +17,7 @@ package sdp
 import (
 	"bytes"
 
-	"github.com/jart/gosip/util"
+	"github.com/deolan/gosip/util"
 )
 
 // Origin represents the session origin (o=) line of an SDP. Who knows what

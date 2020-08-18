@@ -22,8 +22,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/jart/gosip/sip"
-	"github.com/jart/gosip/util"
+	"github.com/deolan/gosip/sip"
+	"github.com/deolan/gosip/util"
 )
 
 // Transport sends and receives SIP messages over UDP with stateless routing.

@@ -34,12 +34,12 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/jart/gosip/dialog"
-	"github.com/jart/gosip/dsp"
-	"github.com/jart/gosip/rtp"
-	"github.com/jart/gosip/sdp"
-	"github.com/jart/gosip/sip"
-	"github.com/jart/gosip/util"
+	"github.com/deolan/gosip/dialog"
+	"github.com/deolan/gosip/dsp"
+	"github.com/deolan/gosip/rtp"
+	"github.com/deolan/gosip/sdp"
+	"github.com/deolan/gosip/sip"
+	"github.com/deolan/gosip/util"
 )
 
 const (

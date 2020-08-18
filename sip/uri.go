@@ -37,7 +37,7 @@ package sip
 import (
 	"bytes"
 
-	"github.com/jart/gosip/util"
+	"github.com/deolan/gosip/util"
 )
 
 const (
