@@ -19,9 +19,9 @@ import (
 )
 
 type Ssrc struct {
-	Id  			string  	// 
-	Attribute    	string  	// 
-	Value   		string  	// 
+	Id  			string  	// ssrc-id, RFC 5576
+	Attribute    	string  	// ssrc attribute
+	Value   		string  	// ssrc value
 }
 
 func (ssrc *Ssrc) Append(b *bytes.Buffer) {

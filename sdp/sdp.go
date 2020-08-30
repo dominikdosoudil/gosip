@@ -254,22 +254,38 @@ func Parse(s string) (sdp *SDP, err error) {
  					sdp.Candidates = append(sdp.Candidates, candidate)
 				}
 			case strings.HasPrefix(line, "ssrc:"):
-				toks := strings.Split(line[5:], " ")
+				toks := strings.Split(line[5:], ":")
 				if toks == nil {
-					log.Println("Invalid SDP SSRC value")
+					toks1 := strings.Split(line[5:], " ")
+					if toks1 == nil {
+						log.Println("Invalid SDP SSRC value")
+					} else {
+						var ssrc Ssrc
+						if len(toks1) >= 1 {
+							ssrc.Id = toks1[0]
+						}
+						if len(toks1) >= 2 {
+							ssrc.Attribute = toks1[1]
+						}
+						sdp.Ssrcs = append(sdp.Ssrcs, ssrc)
+					}
 				} else {
-					var ssrc Ssrc
-					if len(toks) >= 1 {
-						ssrc.Id = toks[0]
+					toks1 := strings.Split(toks[0], " ")
+					if toks1 == nil {
+						log.Println("Invalid SDP SSRC value")
+					} else {
+						var ssrc Ssrc
+						if len(toks1) >= 1 {
+							ssrc.Id = toks1[0]
+						}
+						if len(toks1) >= 2 {
+							ssrc.Attribute = toks1[1]
+						}
+						if len(toks) >= 2 {						
+							ssrc.Value = toks[1]
+						}	 
+						sdp.Ssrcs = append(sdp.Ssrcs, ssrc)
 					}
-					if len(toks) >= 2 {
-						toks1 := strings.Split(toks[1], ":")
-						ssrc.Attribute = toks1[0]
-					}
-					if len(toks) >= 3 {
-						ssrc.Value = toks[2]
-					}				 
-					sdp.Ssrcs = append(sdp.Ssrcs, ssrc)
 				}
 			case strings.HasPrefix(line, "rtcp:"):
 				toks := strings.Split(line[5:], " ")
