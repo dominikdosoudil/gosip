@@ -39,6 +39,16 @@ func (h *XHeader) Get(name string) *XHeader {
 	return h.Next.Get(name)
 }
 
+func (h *XHeader) GetValue(name string) string {
+	if h == nil {
+		return ""
+	}
+	if strings.EqualFold(h.Name, name) {
+		return string(h.Value)
+	}
+	return h.Next.GetValue(name)
+}
+
 // String turns XHeader into a string.
 func (h *XHeader) String() string {
 	var b bytes.Buffer
