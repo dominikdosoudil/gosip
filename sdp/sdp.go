@@ -93,6 +93,7 @@ type SDP struct {
 	Ptime    int         // Transmit frame every N milliseconds (default 20)
 	SendOnly bool        // True if 'a=sendonly' was specified in SDP
 	RecvOnly bool        // True if 'a=recvonly' was specified in SDP
+	Inactive bool        // True if 'a=inactive' was specified in SDP
 	Fprint  *Fingerprint // Fingerprint
 	IceUfrag string 	 // ICE Ufag
 	IcePwd 	 string 	 // ICE password
@@ -329,6 +330,8 @@ func Parse(s string) (sdp *SDP, err error) {
 				sdp.SendOnly = true
 			case line == "recvonly":
 				sdp.RecvOnly = true
+			case line == "inactive":
+				sdp.Inactive = true
 			default:
 				if n := strings.Index(line, ":"); n >= 0 {
 					if n == 0 {
@@ -509,6 +512,8 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 			b.WriteString("a=sendonly\r\n")
 		} else if sdp.RecvOnly {
 			b.WriteString("a=recvonly\r\n")
+		} else if sdp.Inactive {
+			b.WriteString("a=inactive\r\n")
 		} else {
 			b.WriteString("a=sendrecv\r\n")
 		}
