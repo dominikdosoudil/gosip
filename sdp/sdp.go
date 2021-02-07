@@ -101,6 +101,7 @@ type SDP struct {
 	Rtcp     *Rtcp       // RTCP
 	RtcpMux bool         // RTCP MUX attribute
 	Group    *Group      // Group bundle
+	SetupRole string 	 // Setup attribute
 	Candidates []Candidate // ICE candidates
 	Ssrcs []Ssrc 		 // SSRC
 	Attrs    [][2]string // a= lines we don't recognize
@@ -322,7 +323,9 @@ func Parse(s string) (sdp *SDP, err error) {
 					for i := 1; i < len(toks); i++ {
 						sdp.Group.IdentificationTag = append(sdp.Group.IdentificationTag, toks[i])
 					}
-				}						
+				}
+			case strings.HasPrefix(line, "setup:"):
+				sdp.SetupRole = line[6:]									
 			case line == "rtcp-mux":
 				sdp.RtcpMux = true
 			case line == "sendrecv":
@@ -506,6 +509,12 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 	}
 	if sdp.Group != nil {
 		sdp.Group.Append(b)
+	}
+	if sdp.SetupRole == "" {
+	} else {
+		b.WriteString("a=setup:")
+		b.WriteString(sdp.SetupRole)
+		b.WriteString("\r\n")		
 	}
 	if !sdp.IceOnly {
 		if sdp.SendOnly {
