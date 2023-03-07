@@ -63,3 +63,19 @@ func (media *Media) RemoveCodec(name string) bool {
 		return false
 	}
 }
+
+func (media *Media) RemoveCodecWithRate(name string, rate int) bool {
+	dId := -1
+	for i, codec := range media.Codecs {
+		if codec.Name == name && codec.Rate == rate {
+			dId = i
+		}
+	}
+	if dId != -1 {
+		media.Codecs[dId] = media.Codecs[len(media.Codecs)-1]
+    	media.Codecs = media.Codecs[:len(media.Codecs)-1]
+    	return true
+	} else {
+		return false
+	}
+}
