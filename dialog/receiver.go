@@ -20,7 +20,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/deolan/gosip/sip"
+	"github.com/dominikdosoudil/gosip/sip"
 )
 
 func ReceiveMessages(sock *net.UDPConn, c chan<- *sip.Msg, e chan<- error) {

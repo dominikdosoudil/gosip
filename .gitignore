@@ -3,4 +3,5 @@
 /sftp-config.json
 /main
 /main.go
-/main_test.go
+/main_test.go.idea
+.idea

@@ -74,7 +74,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/deolan/gosip/util"
+	"github.com/dominikdosoudil/gosip/util"
 )
 
 const (
@@ -84,28 +84,28 @@ const (
 
 // SDP represents a Session Description Protocol SIP payload.
 type SDP struct {
-	Origin   Origin      // This must always be present
-	Addr     string      // Connect to this IP; never blank (from c=)
-	Audio    *Media      // Non-nil if we can establish audio
-	Video    *Media      // Non-nil if we can establish video
-	Session  string      // s= Session Name (default "-")
-	Time     string      // t= Active Time (default "0 0")
-	Ptime    int         // Transmit frame every N milliseconds (default 20)
-	SendOnly bool        // True if 'a=sendonly' was specified in SDP
-	RecvOnly bool        // True if 'a=recvonly' was specified in SDP
-	Inactive bool        // True if 'a=inactive' was specified in SDP
-	Fprint  *Fingerprint // Fingerprint
-	IceUfrag string 	 // ICE Ufag
-	IcePwd 	 string 	 // ICE password
-	IceOnly  bool        // ICE trickle sdpfrag
-	Rtcp     *Rtcp       // RTCP
-	RtcpMux bool         // RTCP MUX attribute
-	Group    *Group      // Group bundle
-	SetupRole string 	 // Setup attribute
-	Candidates []Candidate // ICE candidates
-	Ssrcs []Ssrc 		 // SSRC
-	Attrs    [][2]string // a= lines we don't recognize
-	Other    [][2]string // Other description
+	Origin     Origin       // This must always be present
+	Addr       string       // Connect to this IP; never blank (from c=)
+	Audio      *Media       // Non-nil if we can establish audio
+	Video      *Media       // Non-nil if we can establish video
+	Session    string       // s= Session Name (default "-")
+	Time       string       // t= Active Time (default "0 0")
+	Ptime      int          // Transmit frame every N milliseconds (default 20)
+	SendOnly   bool         // True if 'a=sendonly' was specified in SDP
+	RecvOnly   bool         // True if 'a=recvonly' was specified in SDP
+	Inactive   bool         // True if 'a=inactive' was specified in SDP
+	Fprint     *Fingerprint // Fingerprint
+	IceUfrag   string       // ICE Ufag
+	IcePwd     string       // ICE password
+	IceOnly    bool         // ICE trickle sdpfrag
+	Rtcp       *Rtcp        // RTCP
+	RtcpMux    bool         // RTCP MUX attribute
+	Group      *Group       // Group bundle
+	SetupRole  string       // Setup attribute
+	Candidates []Candidate  // ICE candidates
+	Ssrcs      []Ssrc       // SSRC
+	Attrs      [][2]string  // a= lines we don't recognize
+	Other      [][2]string  // Other description
 }
 
 // Easy way to create a basic, everyday SDP for VoIP.
@@ -214,7 +214,7 @@ func Parse(s string) (sdp *SDP, err error) {
 				} else {
 					sdp.Fprint = new(Fingerprint)
 					sdp.Fprint.HashFunc = toks[0]
-					sdp.Fprint.Fingerprint = toks[1]					
+					sdp.Fprint.Fingerprint = toks[1]
 				}
 			case strings.HasPrefix(line, "ice-pwd:"):
 				sdp.IcePwd = line[8:]
@@ -229,31 +229,31 @@ func Parse(s string) (sdp *SDP, err error) {
 					candidate.Foundation = toks[0]
 					candidate.ComponentId = toks[1]
 					candidate.Transport = toks[2]
-					if priority, err := strconv.Atoi(toks[3]); err!= nil {
+					if priority, err := strconv.Atoi(toks[3]); err != nil {
 						log.Println("Invalid SDP Candidate priority value")
 					} else {
 						candidate.Priority = priority
 					}
- 					candidate.ConnectionAddress = toks[4]
-					if port, err := strconv.Atoi(toks[5]); err!= nil {
+					candidate.ConnectionAddress = toks[4]
+					if port, err := strconv.Atoi(toks[5]); err != nil {
 						log.Println("Invalid SDP Candidate port value")
 					} else {
 						candidate.Port = port
 					}
- 					if len(toks) >= 8 && toks[6] == "typ" {
- 						candidate.CandType = toks[7]
- 					}
- 					if len(toks) >= 10 && toks[8] == "raddr" {
- 						candidate.RelAddr = toks[9]
- 					}
-  					if len(toks) >= 12 && toks[10] == "rport" {
+					if len(toks) >= 8 && toks[6] == "typ" {
+						candidate.CandType = toks[7]
+					}
+					if len(toks) >= 10 && toks[8] == "raddr" {
+						candidate.RelAddr = toks[9]
+					}
+					if len(toks) >= 12 && toks[10] == "rport" {
 						if relPort, err := strconv.Atoi(toks[11]); err != nil {
 							log.Println("Invalid SDP Candidate relport value")
 						} else {
 							candidate.RelPort = relPort
 						}
- 					}
- 					sdp.Candidates = append(sdp.Candidates, candidate)
+					}
+					sdp.Candidates = append(sdp.Candidates, candidate)
 				}
 			case strings.HasPrefix(line, "ssrc:"):
 				toks := strings.Split(line[5:], ":")
@@ -283,9 +283,9 @@ func Parse(s string) (sdp *SDP, err error) {
 						if len(toks1) >= 2 {
 							ssrc.Attribute = toks1[1]
 						}
-						if len(toks) >= 2 {						
+						if len(toks) >= 2 {
 							ssrc.Value = toks[1]
-						}	 
+						}
 						sdp.Ssrcs = append(sdp.Ssrcs, ssrc)
 					}
 				}
@@ -310,8 +310,8 @@ func Parse(s string) (sdp *SDP, err error) {
 						} else {
 							rtcp.Port = uint16(port)
 							sdp.Rtcp = &rtcp
-						}		
-					}		
+						}
+					}
 				}
 			case strings.HasPrefix(line, "group:"):
 				toks := strings.Split(line[6:], " ")
@@ -325,7 +325,7 @@ func Parse(s string) (sdp *SDP, err error) {
 					}
 				}
 			case strings.HasPrefix(line, "setup:"):
-				sdp.SetupRole = line[6:]									
+				sdp.SetupRole = line[6:]
 			case line == "rtcp-mux":
 				sdp.RtcpMux = true
 			case line == "sendrecv":
@@ -493,13 +493,13 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 	} else {
 		b.WriteString("a=ice-pwd:")
 		b.WriteString(sdp.IcePwd)
-		b.WriteString("\r\n")		
+		b.WriteString("\r\n")
 	}
 	if sdp.IceUfrag == "" {
 	} else {
 		b.WriteString("a=ice-ufrag:")
 		b.WriteString(sdp.IceUfrag)
-		b.WriteString("\r\n")		
+		b.WriteString("\r\n")
 	}
 	for i, _ := range sdp.Candidates {
 		sdp.Candidates[i].Append(b)
@@ -514,7 +514,7 @@ func (sdp *SDP) Append(b *bytes.Buffer) {
 	} else {
 		b.WriteString("a=setup:")
 		b.WriteString(sdp.SetupRole)
-		b.WriteString("\r\n")		
+		b.WriteString("\r\n")
 	}
 	if !sdp.IceOnly {
 		if sdp.SendOnly {

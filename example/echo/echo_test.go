@@ -153,10 +153,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/deolan/gosip/rtp"
-	"github.com/deolan/gosip/sdp"
-	"github.com/deolan/gosip/sip"
-	"github.com/deolan/gosip/util"
+	"github.com/dominikdosoudil/gosip/rtp"
+	"github.com/dominikdosoudil/gosip/sdp"
+	"github.com/dominikdosoudil/gosip/sip"
+	"github.com/dominikdosoudil/gosip/util"
 )
 
 func TestCallToEchoApp(t *testing.T) {

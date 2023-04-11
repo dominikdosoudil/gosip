@@ -35,7 +35,7 @@ package sip
 import (
 	"bytes"
 
-	"github.com/deolan/gosip/util"
+	"github.com/dominikdosoudil/gosip/util"
 )
 
 // Represents a SIP Address Linked List

@@ -17,7 +17,7 @@ package dsp_test
 import (
 	"testing"
 
-	"github.com/deolan/gosip/dsp"
+	"github.com/dominikdosoudil/gosip/dsp"
 )
 
 func TestAWGN(t *testing.T) {

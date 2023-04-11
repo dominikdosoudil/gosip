@@ -19,7 +19,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/deolan/gosip/sip"
+	"github.com/dominikdosoudil/gosip/sip"
 )
 
 type uriTest struct {

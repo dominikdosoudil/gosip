@@ -22,8 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/deolan/gosip/sip"
-	"github.com/deolan/gosip/util"
+	"github.com/dominikdosoudil/gosip/sip"
+	"github.com/dominikdosoudil/gosip/util"
 )
 
 func TestOptions(t *testing.T) {

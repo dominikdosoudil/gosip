@@ -18,7 +18,7 @@ package sip
 import (
 	"errors"
 	"fmt"
-	"github.com/deolan/gosip/sdp"
+	"github.com/dominikdosoudil/gosip/sdp"
 )
 
 %% machine msg;
