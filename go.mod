@@ -1,3 +1,3 @@
-module github.com/deolan/gosip
+module github.com/dominikdosoudil/gosip
 
 go 1.14
