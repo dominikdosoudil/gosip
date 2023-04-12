@@ -26,12 +26,12 @@ package dsp
 //
 // TODO(jart): How do I make assembly use proper types?
 // func LinearToUlaw(linear int64) (ulaw int64)
-func LinearToUlaw(pcm_val int16) uint8 { // 2's complement (16-bit range)
-return 0
+func LinearToUlaw(pcm_val int64) uint8 { // 2's complement (16-bit range)
+	return 0
 }
 
 // Turns a μ-Law byte back into an audio sample.
 // func UlawToLinear(ulaw int64) (linear int64)
-func UlawToLinear(u_val uint8) int16 {
-return 0
+func UlawToLinear(u_val int64) int16 {
+	return 0
 }
